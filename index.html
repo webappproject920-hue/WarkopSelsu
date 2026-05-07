@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Warkop SelSu & Zamore</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#f5f6fa;
+  display:flex;
+  color:#222;
+}
+
+.sidebar{
+  width:240px;
+  background:#fff;
+  height:100vh;
+  padding:20px;
+  border-right:1px solid #eee;
+  position:fixed;
+  left:0;
+  top:0;
+}
+
+.logo{
+  font-size:28px;
+  font-weight:bold;
+  color:#e63946;
+  margin-bottom:30px;
+}
+
+.menu{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.menu button{
+  border:none;
+  padding:14px;
+  border-radius:12px;
+  background:#f1f1f1;
+  cursor:pointer;
+  text-align:left;
+  font-size:15px;
+  transition:.2s;
+}
+
+.menu button:hover,
+.menu button.active{
+  background:#e63946;
+  color:white;
+}
+
+.main{
+  margin-left:260px;
+  padding:20px;
+  width:calc(100% - 260px);
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.search{
+  padding:12px;
+  width:300px;
+  border-radius:10px;
+  border:1px solid #ddd;
+}
+
+.filter-group{
+  display:flex;
+  gap:10px;
+}
+
+.filter-group button{
+  padding:10px 16px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  background:white;
+  border:1px solid #ddd;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+  margin-bottom:20px;
+}
+
+.card{
+  background:white;
+  padding:20px;
+  border-radius:20px;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
+
+.card h3{
+  color:#666;
+  margin-bottom:10px;
+  font-size:15px;
+}
+
+.card h1{
+  font-size:28px;
+  color:#e63946;
+}
+
+.chart-box,
+.table-box{
+  background:white;
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:20px;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
+
+.best-seller{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:15px;
+  margin-top:20px;
+}
+
+.best-item{
+  background:#fafafa;
+  border-radius:15px;
+  padding:15px;
+}
+
+.best-item h4{
+  margin-bottom:8px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+}
+
+th,td{
+  padding:14px;
+  border-bottom:1px solid #eee;
+  text-align:left;
+  font-size:14px;
+}
+
+th{
+  background:#fafafa;
+}
+
+.profit{
+  color:green;
+  font-weight:bold;
+}
+
+@media(max-width:900px){
+
+.sidebar{
+  display:none;
+}
+
+.main{
+  margin-left:0;
+  width:100%;
+}
+
+.search{
+  width:100%;
+}
+
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+
+<div class="logo">Warkop SelSu & Zamore </div>
+
+<div class="menu">
+<button class="active">Dashboard</button>
+
+<button onclick="location.href='kasir.html'">
+Kasir
+</button>
+
+<button>Produk</button>
+<button>Statistik</button>
+
+<button onclick="location.href='laporan.html'">
+Laporan
+</button>
+
+</div>
+</div>
+
+<div class="main">
+
+<div class="topbar">
+
+<input
+type="text"
+class="search"
+placeholder="Cari menu..."
+onkeyup="searchMenu(this.value)"
+>
+
+<div class="filter-group">
+<button>Daily</button>
+<button>Weekly</button>
+<button>Monthly</button>
+</div>
+
+</div>
+
+<div class="cards">
+
+<div class="card">
+<h3>Total Menu</h3>
+<h1 id="totalMenu">0</h1>
+</div>
+
+<div class="card">
+<h3>Total Transaksi</h3>
+<h1 id="totalTransaksi">0</h1>
+</div>
+
+<div class="card">
+<h3>Total Omzet</h3>
+<h1 id="totalOmzet">Rp0</h1>
+</div>
+
+<div class="card">
+<h3>Total Item Terjual</h3>
+<h1 id="totalItem">0</h1>
+</div>
+
+</div>
+
+<div class="chart-box">
+
+<h2>Grafik Omzet Harian</h2>
+
+<br>
+
+<canvas id="salesChart"></canvas>
+
+</div>
+
+<div class="chart-box">
+
+<h2>Best Seller</h2>
+
+<div class="best-seller" id="bestSeller"></div>
+
+</div>
+
+<div class="table-box">
+
+<h2>Daftar Produk</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Nama Menu</th>
+<th>Modal</th>
+<th>Harga Jual</th>
+<th>Profit</th>
+<th>Margin</th>
+</tr>
+</thead>
+
+<tbody id="menuTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+const menuData = [
+
+["Nasi Telor Crispy",6500,12000],
+["Nasi Goreng Kampung",7500,15000],
+["Nasi Goreng Kecap",7500,15000],
+["Rice Bowl",8500,15000],
+["Snack Platter",8500,15000],
+["Mie Nyemek Bangladesh",9000,15000],
+["Mie Nyemek Jogja",9000,15000],
+["Mie Rebus Telor",6500,12000],
+["Mie Goreng Telor",6500,12000],
+["Kentang Goreng",5000,10000],
+["Bakso Goreng",5000,10000],
+["Cireng Rujak",4500,10000],
+["Mini Bakpao",3500,10000],
+["Roti Bakar Coklat",5500,10000],
+["Roti Bakar Keju",5500,10000],
+["Roti Bakar Coklat Keju",5500,10000],
+["Otak - Otak",3000,10000],
+["Nasi",2000,4000],
+["Air Mineral",1500,5000],
+["Good Day Freeze",3000,7000],
+["Good Day Cappucino",3000,7000],
+["ABC Klepon",3000,7000],
+["Bonteh Teh Tarik",3000,7000],
+["Bonteh Matcha",3000,7000],
+["Chocolatos Coklat",3000,8000],
+["Chocolatos Matcha",3000,8000],
+["Drink Beng Beng",3000,8000],
+["Hilo Banana",2500,8000],
+["Hilo Hazelnut",2500,8000],
+["Nutrisari Jeruk",2000,6000],
+["Nutrisari Leci",2000,6000],
+["Josu",2500,6000],
+["Luwak",2000,7000],
+["Indocafe",2000,7000],
+["Creamy Latte",2000,7000],
+["Nescafe",2000,6000],
+["Susu Coklat",2500,7000],
+["Susu Putih",2500,7000],
+["Wedang Bajigur",2500,7000],
+["Kapal Api (Hot)",2500,5000],
+["ABC Susu",2500,5000],
+["Minuman All (Hot)",2500,5000],
+["Pisang Nugget isi 4",5500,10000],
+["Pisang Nugget isi 6",8500,15000],
+["Basic Cookies",1500,5000],
+["Cookies Cadbury",5000,10000],
+["Cookies S'Mores",5000,10000],
+["Cookies Cheese",5000,10000],
+["Lotus Biscoff",7000,12000],
+["Brownbites",8500,15000],
+["Brownies Lumer",8500,15000],
+["Brownies Chruncy",8500,15000],
+["Brownies Cream Cheese",10000,15000],
+["Dessert Platter",10000,15000]
+
+];
+
+const transaksi =
+JSON.parse(localStorage.getItem('transaksi')) || [];
+
+const table =
+document.getElementById('menuTable');
+
+const bestSeller =
+document.getElementById('bestSeller');
+
+function rupiah(num){
+return 'Rp' + num.toLocaleString('id-ID');
+}
+
+function renderTable(data){
+
+table.innerHTML='';
+
+data.forEach(item=>{
+
+const nama=item[0];
+const modal=item[1];
+const jual=item[2];
+
+const profit=jual-modal;
+
+const margin=
+((profit/modal)*100).toFixed(0);
+
+table.innerHTML += `
+<tr>
+<td>${nama}</td>
+<td>${rupiah(modal)}</td>
+<td>${rupiah(jual)}</td>
+<td class="profit">${rupiah(profit)}</td>
+<td>${margin}%</td>
+</tr>
+`;
+
+});
+
+document.getElementById('totalMenu')
+.innerText=data.length;
+
+}
+
+renderTable(menuData);
+
+function searchMenu(keyword){
+
+const filtered =
+menuData.filter(item=>
+item[0]
+.toLowerCase()
+.includes(keyword.toLowerCase())
+);
+
+renderTable(filtered);
+
+}
+
+let totalOmzet=0;
+let totalItem=0;
+let totalTransaksi=transaksi.length;
+
+const produkTerjual={};
+const grafikHarian={};
+
+transaksi.forEach(trx=>{
+
+let total=0;
+
+trx.items.forEach(item=>{
+
+total += item.harga * item.qty;
+
+totalItem += item.qty;
+
+if(produkTerjual[item.nama]){
+produkTerjual[item.nama]+=item.qty;
+}else{
+produkTerjual[item.nama]=item.qty;
+}
+
+});
+
+totalOmzet += total;
+
+const tanggal =
+new Date(trx.tanggal)
+.toLocaleDateString('id-ID');
+
+if(grafikHarian[tanggal]){
+grafikHarian[tanggal]+=total;
+}else{
+grafikHarian[tanggal]=total;
+}
+
+});
+
+document.getElementById('totalTransaksi')
+.innerText=totalTransaksi;
+
+document.getElementById('totalOmzet')
+.innerText=rupiah(totalOmzet);
+
+document.getElementById('totalItem')
+.innerText=totalItem;
+
+const sortedProduk =
+Object.entries(produkTerjual)
+.sort((a,b)=>b[1]-a[1])
+.slice(0,4);
+
+sortedProduk.forEach(item=>{
+
+bestSeller.innerHTML += `
+<div class="best-item">
+<h4>${item[0]}</h4>
+<p>${item[1]} Terjual</p>
+</div>
+`;
+
+});
+
+const labels =
+Object.keys(grafikHarian);
+
+const values =
+Object.values(grafikHarian);
+
+const ctx =
+document.getElementById('salesChart');
+
+new Chart(ctx, {
+
+type:'line',
+
+data:{
+labels:labels,
+datasets:[{
+label:'Omzet Harian',
+data:values,
+borderWidth:3,
+tension:0.4
+}]
+},
+
+options:{
+responsive:true
+}
+
+});
+
+</script>
+
+</body>
+</html>

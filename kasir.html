@@ -1,0 +1,493 @@
+<!DOCTYPE html><html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kasir Warkop POS</title>  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f4f5f7;
+      display: flex;
+      min-height: 100vh;
+      color: #222;
+    }
+
+    .sidebar {
+      width: 230px;
+      background: white;
+      padding: 20px;
+      border-right: 1px solid #eee;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #e63946;
+      margin-bottom: 30px;
+    }
+
+    .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .menu button {
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      background: #f3f3f3;
+      cursor: pointer;
+      text-align: left;
+      transition: 0.2s;
+    }
+
+    .menu button.active,
+    .menu button:hover {
+      background: #e63946;
+      color: white;
+    }
+
+    .main {
+      flex: 1;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    .produk-section {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+
+    .search {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+
+    .kategori {
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+
+    .produk-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 15px;
+    }
+
+    .produk-card {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 18px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .produk-card:hover {
+      transform: scale(1.02);
+    }
+
+    .produk-img {
+      height: 120px;
+      background: #ececec;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+
+    .produk-info {
+      padding: 12px;
+    }
+
+    .produk-info h4 {
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .produk-info p {
+      color: #e63946;
+      font-weight: bold;
+    }
+
+    .cart {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cart h2 {
+      margin-bottom: 20px;
+    }
+
+    .cart-items {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .cart-item {
+      border-bottom: 1px solid #eee;
+      padding: 12px 0;
+    }
+
+    .cart-item-top {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .qty-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .qty-box button {
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #e63946;
+      color: white;
+      font-weight: bold;
+    }
+
+    .total-box {
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+      margin-top: 20px;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .checkout-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .cash {
+      background: #222;
+      color: white;
+    }
+
+    .qris {
+      background: #e63946;
+      color: white;
+    }
+
+    @media(max-width:1000px){
+      .main {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+    }
+  </style></head>
+<body>  <div class="sidebar">
+    <div class="logo">Warkop POS</div><div class="menu">
+  <button>Dashboard</button>
+  <button class="active">Kasir</button>
+  <button>Produk</button>
+  <button>Statistik</button>
+  <button>Laporan</button>
+</div>
+
+  </div>  <div class="main"><div class="produk-section">
+
+  <div class="topbar">
+    <input type="text" class="search" placeholder="Cari menu..." onkeyup="searchProduk(this.value)">
+
+    <select class="kategori" onchange="filterKategori(this.value)">
+      <option value="Semua">Semua</option>
+      <option value="Makanan">Makanan</option>
+      <option value="Snack">Snack</option>
+      <option value="Minuman">Minuman</option>
+      <option value="Dessert">Dessert</option>
+    </select>
+  </div>
+
+  <div class="produk-grid" id="produkGrid"></div>
+
+</div>
+
+<div class="cart">
+  <h2>Keranjang</h2>
+
+  <div class="cart-items" id="cartItems"></div>
+
+  <div class="total-box">
+    <div class="total-row">
+      <span>Total</span>
+      <strong id="grandTotal">Rp0</strong>
+    </div>
+
+    <button class="checkout-btn cash" onclick="checkout('Cash')">Bayar Cash</button>
+    <button class="checkout-btn qris" onclick="checkout('QRIS')">Bayar QRIS</button>
+  </div>
+</div>
+
+  </div>  <script>
+    const produk = [
+      {nama:'Nasi Telor Crispy',harga:12000,kategori:'Makanan'},
+      {nama:'Nasi Goreng Kampung',harga:15000,kategori:'Makanan'},
+      {nama:'Nasi Goreng Kecap',harga:15000,kategori:'Makanan'},
+      {nama:'Rice Bowl',harga:15000,kategori:'Makanan'},
+      {nama:'Snack Platter',harga:15000,kategori:'Snack'},
+      {nama:'Mie Nyemek Bangladesh',harga:15000,kategori:'Makanan'},
+      {nama:'Mie Nyemek Jogja',harga:15000,kategori:'Makanan'},
+      {nama:'Mie Rebus Telor',harga:12000,kategori:'Makanan'},
+      {nama:'Mie Goreng Telor',harga:12000,kategori:'Makanan'},
+      {nama:'Kentang Goreng',harga:10000,kategori:'Snack'},
+      {nama:'Bakso Goreng',harga:10000,kategori:'Snack'},
+      {nama:'Cireng Rujak',harga:10000,kategori:'Snack'},
+      {nama:'Mini Bakpao',harga:10000,kategori:'Snack'},
+      {nama:'Roti Bakar Coklat',harga:10000,kategori:'Snack'},
+      {nama:'Roti Bakar Keju',harga:10000,kategori:'Snack'},
+      {nama:'Roti Bakar Coklat Keju',harga:10000,kategori:'Snack'},
+      {nama:'Otak - Otak',harga:10000,kategori:'Snack'},
+      {nama:'Nasi',harga:4000,kategori:'Makanan'},
+      {nama:'Air Mineral',harga:5000,kategori:'Minuman'},
+      {nama:'Good Day Freeze',harga:7000,kategori:'Minuman'},
+      {nama:'Good Day Cappucino',harga:7000,kategori:'Minuman'},
+      {nama:'ABC Klepon',harga:7000,kategori:'Minuman'},
+      {nama:'Bonteh Teh Tarik',harga:7000,kategori:'Minuman'},
+      {nama:'Bonteh Matcha',harga:7000,kategori:'Minuman'},
+      {nama:'Chocolatos Coklat',harga:8000,kategori:'Minuman'},
+      {nama:'Chocolatos Matcha',harga:8000,kategori:'Minuman'},
+      {nama:'Drink Beng Beng',harga:8000,kategori:'Minuman'},
+      {nama:'Hilo Banana',harga:8000,kategori:'Minuman'},
+      {nama:'Hilo Hazelnut',harga:8000,kategori:'Minuman'},
+      {nama:'Nutrisari Jeruk',harga:6000,kategori:'Minuman'},
+      {nama:'Nutrisari Leci',harga:6000,kategori:'Minuman'},
+      {nama:'Josu',harga:6000,kategori:'Minuman'},
+      {nama:'Luwak',harga:7000,kategori:'Minuman'},
+      {nama:'Indocafe',harga:7000,kategori:'Minuman'},
+      {nama:'Creamy Latte',harga:7000,kategori:'Minuman'},
+      {nama:'Nescafe',harga:6000,kategori:'Minuman'},
+      {nama:'Susu Coklat',harga:7000,kategori:'Minuman'},
+      {nama:'Susu Putih',harga:7000,kategori:'Minuman'},
+      {nama:'Wedang Bajigur',harga:7000,kategori:'Minuman'},
+      {nama:'Kapal Api (Hot)',harga:5000,kategori:'Minuman'},
+      {nama:'ABC Susu',harga:5000,kategori:'Minuman'},
+      {nama:'Minuman All (Hot)',harga:5000,kategori:'Minuman'},
+      {nama:'Pisang Nugget isi 4',harga:10000,kategori:'Snack'},
+      {nama:'Pisang Nugget isi 6',harga:15000,kategori:'Snack'},
+      {nama:'Basic Cookies',harga:5000,kategori:'Dessert'},
+      {nama:'Cookies Cadbury',harga:10000,kategori:'Dessert'},
+      {nama:'Cookies S\'Mores',harga:10000,kategori:'Dessert'},
+      {nama:'Cookies Cheese',harga:10000,kategori:'Dessert'},
+      {nama:'Lotus Biscoff',harga:12000,kategori:'Dessert'},
+      {nama:'Brownbites',harga:15000,kategori:'Dessert'},
+      {nama:'Brownies Lumer',harga:15000,kategori:'Dessert'},
+      {nama:'Brownies Chruncy',harga:15000,kategori:'Dessert'},
+      {nama:'Brownies Cream Cheese',harga:15000,kategori:'Dessert'},
+      {nama:'Dessert Platter',harga:15000,kategori:'Dessert'}
+    ];
+
+    let cart = [];
+
+    const produkGrid = document.getElementById('produkGrid');
+    const cartItems = document.getElementById('cartItems');
+
+    function rupiah(angka){
+      return 'Rp' + angka.toLocaleString('id-ID');
+    }
+
+    function renderProduk(data){
+      produkGrid.innerHTML = '';
+
+      data.forEach((item)=>{
+        const originalIndex = produk.findIndex(p => p.nama === item.nama);
+
+        produkGrid.innerHTML += `
+          <div class="produk-card" onclick="addToCart(${originalIndex})">
+            <div class="produk-img">🍽️</div>
+            <div class="produk-info">
+              <h4>${item.nama}</h4>
+              <p>${rupiah(item.harga)}</p>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    renderProduk(produk);
+
+    function addToCart(index){
+      const item = produk[index];
+
+      const existing = cart.find(i => i.nama === item.nama);
+
+      if(existing){
+        existing.qty++;
+      } else {
+        cart.push({
+          nama: item.nama,
+          harga: item.harga,
+          qty: 1
+        });
+      }
+
+      renderCart();
+    }
+
+    function renderCart(){
+      cartItems.innerHTML = '';
+
+      let total = 0;
+
+      cart.forEach((item,index)=>{
+        total += item.harga * item.qty;
+
+        cartItems.innerHTML += `
+          <div class="cart-item">
+            <div class="cart-item-top">
+              <strong>${item.nama}</strong>
+              <span>${rupiah(item.harga * item.qty)}</span>
+            </div>
+
+            <div class="qty-box">
+              <button onclick="kurangQty(${index})">-</button>
+              <span>${item.qty}</span>
+              <button onclick="tambahQty(${index})">+</button>
+            </div>
+          </div>
+        `;
+      });
+
+      document.getElementById('grandTotal').innerText = rupiah(total);
+    }
+
+    function tambahQty(index){
+      cart[index].qty++;
+      renderCart();
+    }
+
+    function kurangQty(index){
+      cart[index].qty--;
+
+      if(cart[index].qty <= 0){
+        cart.splice(index,1);
+      }
+
+      renderCart();
+    }
+
+function checkout(metode){
+
+  if(cart.length === 0){
+    alert('Keranjang kosong');
+    return;
+  }
+
+  const transaksi = {
+    tanggal: new Date().toLocaleString(),
+    metode,
+    items: cart
+  };
+
+  let data = JSON.parse(localStorage.getItem('transaksi')) || [];
+  data.push(transaksi);
+
+  localStorage.setItem('transaksi', JSON.stringify(data));
+
+  // =========================
+  // GOOGLE SHEETS API
+  // =========================
+
+  const scriptURL =
+  "https://script.google.com/macros/s/AKfycbyB0_f8z2BV5szaA3tnEmwAD9UqjdU0A5d8TAVg-SuXTIoiGH7Y4yzfa99roTzpYS81/exec";
+
+  cart.forEach(item => {
+
+    fetch(scriptURL, {
+
+      method: "POST",
+
+      redirect: "follow",
+
+      headers: {
+        "Content-Type":
+        "text/plain;charset=utf-8"
+      },
+
+      body: JSON.stringify({
+
+        tanggal:
+        new Date().toLocaleString("id-ID"),
+
+        menu: item.nama,
+
+        qty: item.qty,
+
+        total: item.harga * item.qty,
+
+        metode: metode
+
+      })
+
+    })
+    .then(res => console.log("Sukses"))
+    .catch(err => console.log(err));
+
+  });
+
+  // =========================
+
+  alert('Pembayaran ' + metode + ' berhasil');
+
+  cart = [];
+  renderCart();
+}
+    function searchProduk(keyword){
+      const hasil = produk.filter(item =>
+        item.nama.toLowerCase().includes(keyword.toLowerCase())
+      );
+
+      renderProduk(hasil);
+    }
+
+    function filterKategori(kategori){
+      if(kategori === 'Semua'){
+        renderProduk(produk);
+      } else {
+        const hasil = produk.filter(item => item.kategori === kategori);
+        renderProduk(hasil);
+      }
+    }
+  </script></body>
+</html>

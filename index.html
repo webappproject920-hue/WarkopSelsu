@@ -299,6 +299,8 @@ onkeyup="searchMenu(this.value)"
 
 <script>
 
+const API_URL = "https://script.google.com/macros/s/AKfycbyB0_f8z2BV5szaA3tnEmwAD9UqjdU0A5d8TAVg-SuXTIoiGH7Y4yzfa99roTzpYS81/exec";
+
 const menuData = [
 
 ["Nasi Telor Crispy",6500,12000],
@@ -358,8 +360,7 @@ const menuData = [
 
 ];
 
-const transaksi =
-JSON.parse(localStorage.getItem('transaksi')) || [];
+let transaksi = [];
 
 const table =
 document.getElementById('menuTable');
@@ -418,6 +419,32 @@ renderTable(filtered);
 
 }
 
+async function loadData(){
+
+try{
+
+const res =
+await fetch(API_URL + "?t=" + Date.now());
+
+const data =
+await res.json();
+
+transaksi = data;
+
+renderDashboard();
+
+}catch(err){
+
+console.log(err);
+
+}
+
+}
+
+let salesChart;
+
+function renderDashboard(){
+
 let totalOmzet=0;
 let totalItem=0;
 let totalTransaksi=transaksi.length;
@@ -466,6 +493,8 @@ document.getElementById('totalOmzet')
 document.getElementById('totalItem')
 .innerText=totalItem;
 
+bestSeller.innerHTML = "";
+
 const sortedProduk =
 Object.entries(produkTerjual)
 .sort((a,b)=>b[1]-a[1])
@@ -491,7 +520,11 @@ Object.values(grafikHarian);
 const ctx =
 document.getElementById('salesChart');
 
-new Chart(ctx, {
+if(salesChart){
+salesChart.destroy();
+}
+
+salesChart = new Chart(ctx, {
 
 type:'line',
 
@@ -511,7 +544,13 @@ responsive:true
 
 });
 
+}
+
+loadData();
+
+setInterval(loadData,5000);
+
 </script>
 
 </body>
-</html>
+  </html>

@@ -231,6 +231,7 @@ display:none;
 <div class="logo">Warkop POS</div>
 
 <div class="menu">
+
 <button onclick="location.href='index.html'">
 Dashboard
 </button>
@@ -240,11 +241,13 @@ Kasir
 </button>
 
 <button>Produk</button>
+
 <button>Statistik</button>
 
 <button onclick="location.href='laporan.html'">
 Laporan
 </button>
+
 </div>
 
 </div>
@@ -390,7 +393,7 @@ return 'Rp' + angka.toLocaleString('id-ID');
 
 function renderProduk(data){
 
-produkGrid.innerHTML = '';
+produkGrid.innerHTML='';
 
 data.forEach((item)=>{
 
@@ -500,22 +503,6 @@ alert('Keranjang kosong');
 return;
 }
 
-const transaksi = {
-tanggal:new Date().toISOString(),
-metode:metode,
-items:cart
-};
-
-let data =
-JSON.parse(localStorage.getItem('transaksi')) || [];
-
-data.push(transaksi);
-
-localStorage.setItem(
-'transaksi',
-JSON.stringify(data)
-);
-
 try{
 
 await fetch(API_URL,{
@@ -526,11 +513,19 @@ headers:{
 "Content-Type":"text/plain;charset=utf-8"
 },
 
-body:JSON.stringify(transaksi)
+body:JSON.stringify({
+tanggal:new Date().toISOString(),
+metode:metode,
+items:cart
+})
 
 });
 
 alert('Pembayaran ' + metode + ' berhasil');
+
+cart = [];
+
+renderCart();
 
 }catch(err){
 
@@ -539,10 +534,6 @@ console.log(err);
 alert('Gagal sync server');
 
 }
-
-cart = [];
-
-renderCart();
 
 }
 

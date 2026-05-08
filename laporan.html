@@ -1,282 +1,399 @@
-<!DOCTYPE html><html lang="id">
+<!DOCTYPE html>
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Laporan Warkop POS</title>  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laporan Warkop POS</title>
 
-    body {
-      background: #f4f5f7;
-      display: flex;
-      min-height: 100vh;
-      color: #222;
-    }
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
 
-    .sidebar {
-      width: 230px;
-      background: white;
-      padding: 20px;
-      border-right: 1px solid #eee;
-    }
+body{
+background:#f4f5f7;
+display:flex;
+min-height:100vh;
+color:#222;
+}
 
-    .logo {
-      font-size: 28px;
-      font-weight: bold;
-      color: #e63946;
-      margin-bottom: 30px;
-    }
+.sidebar{
+width:230px;
+background:white;
+padding:20px;
+border-right:1px solid #eee;
+}
 
-    .menu {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+.logo{
+font-size:28px;
+font-weight:bold;
+color:#e63946;
+margin-bottom:30px;
+}
 
-    .menu button {
-      border: none;
-      padding: 14px;
-      border-radius: 12px;
-      background: #f3f3f3;
-      cursor: pointer;
-      text-align: left;
-      transition: 0.2s;
-    }
+.menu{
+display:flex;
+flex-direction:column;
+gap:12px;
+}
 
-    .menu button.active,
-    .menu button:hover {
-      background: #e63946;
-      color: white;
-    }
+.menu button{
+border:none;
+padding:14px;
+border-radius:12px;
+background:#f3f3f3;
+cursor:pointer;
+text-align:left;
+transition:.2s;
+}
 
-    .main {
-      flex: 1;
-      padding: 20px;
-    }
+.menu button.active,
+.menu button:hover{
+background:#e63946;
+color:white;
+}
 
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
+.main{
+flex:1;
+padding:20px;
+}
 
-    .filter-group {
-      display: flex;
-      gap: 10px;
-    }
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+flex-wrap:wrap;
+gap:10px;
+}
 
-    .filter-group button {
-      padding: 12px 16px;
-      border: none;
-      border-radius: 10px;
-      background: white;
-      border: 1px solid #ddd;
-      cursor: pointer;
-    }
+.filter-group{
+display:flex;
+gap:10px;
+}
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-      gap: 20px;
-      margin-bottom: 20px;
-    }
+.filter-group button{
+padding:12px 16px;
+border:none;
+border-radius:10px;
+background:white;
+border:1px solid #ddd;
+cursor:pointer;
+}
 
-    .card {
-      background: white;
-      border-radius: 20px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+margin-bottom:20px;
+}
 
-    .card h3 {
-      margin-bottom: 10px;
-      color: #666;
-      font-size: 15px;
-    }
+.card{
+background:white;
+border-radius:20px;
+padding:20px;
+box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
 
-    .card h1 {
-      color: #e63946;
-      font-size: 28px;
-    }
+.card h3{
+margin-bottom:10px;
+color:#666;
+font-size:15px;
+}
 
-    .table-box {
-      background: white;
-      border-radius: 20px;
-      padding: 20px;
-      overflow-x: auto;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
+.card h1{
+color:#e63946;
+font-size:28px;
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
+.table-box{
+background:white;
+border-radius:20px;
+padding:20px;
+overflow-x:auto;
+box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
 
-    th, td {
-      padding: 14px;
-      border-bottom: 1px solid #eee;
-      text-align: left;
-      font-size: 14px;
-    }
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
 
-    th {
-      background: #fafafa;
-    }
+th,td{
+padding:14px;
+border-bottom:1px solid #eee;
+text-align:left;
+font-size:14px;
+}
 
-    .cash {
-      color: #222;
-      font-weight: bold;
-    }
+th{
+background:#fafafa;
+}
 
-    .qris {
-      color: #e63946;
-      font-weight: bold;
-    }
+.cash{
+color:#222;
+font-weight:bold;
+}
 
-    .detail-item {
-      margin-bottom: 6px;
-      font-size: 13px;
-    }
+.qris{
+color:#e63946;
+font-weight:bold;
+}
 
-    @media(max-width:900px){
-      .sidebar {
-        display: none;
-      }
-    }
-  </style></head>
-<body>  <div class="sidebar">
-    <div class="logo">Warkop POS</div><div class="menu">
-  <button>Dashboard</button>
-  <button>Kasir</button>
-  <button>Produk</button>
-  <button>Statistik</button>
-  <button class="active">Laporan</button>
+.detail-item{
+margin-bottom:6px;
+font-size:13px;
+}
+
+@media(max-width:900px){
+
+.sidebar{
+display:none;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<div class="logo">Warkop POS</div>
+
+<div class="menu">
+
+<button onclick="location.href='index.html'">
+Dashboard
+</button>
+
+<button onclick="location.href='kasir.html'">
+Kasir
+</button>
+
+<button>
+Produk
+</button>
+
+<button>
+Statistik
+</button>
+
+<button class="active">
+Laporan
+</button>
+
 </div>
 
-  </div>  <div class="main"><div class="topbar">
-  <h1>Laporan Penjualan</h1>
+</div>
 
-  <div class="filter-group">
-    <button onclick="filterData('all')">Semua</button>
-    <button onclick="filterData('Cash')">Cash</button>
-    <button onclick="filterData('QRIS')">QRIS</button>
-  </div>
+<div class="main">
+
+<div class="topbar">
+
+<h1>Laporan Penjualan</h1>
+
+<div class="filter-group">
+
+<button onclick="filterData('all')">
+Semua
+</button>
+
+<button onclick="filterData('Cash')">
+Cash
+</button>
+
+<button onclick="filterData('QRIS')">
+QRIS
+</button>
+
+</div>
+
 </div>
 
 <div class="cards">
-  <div class="card">
-    <h3>Total Transaksi</h3>
-    <h1 id="totalTransaksi">0</h1>
-  </div>
 
-  <div class="card">
-    <h3>Total Omzet</h3>
-    <h1 id="totalOmzet">Rp0</h1>
-  </div>
+<div class="card">
+<h3>Total Transaksi</h3>
+<h1 id="totalTransaksi">0</h1>
+</div>
 
-  <div class="card">
-    <h3>Pembayaran Cash</h3>
-    <h1 id="cashTotal">Rp0</h1>
-  </div>
+<div class="card">
+<h3>Total Omzet</h3>
+<h1 id="totalOmzet">Rp0</h1>
+</div>
 
-  <div class="card">
-    <h3>Pembayaran QRIS</h3>
-    <h1 id="qrisTotal">Rp0</h1>
-  </div>
+<div class="card">
+<h3>Pembayaran Cash</h3>
+<h1 id="cashTotal">Rp0</h1>
+</div>
+
+<div class="card">
+<h3>Pembayaran QRIS</h3>
+<h1 id="qrisTotal">Rp0</h1>
+</div>
+
 </div>
 
 <div class="table-box">
-  <h2>Riwayat Transaksi</h2>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Tanggal</th>
-        <th>Metode</th>
-        <th>Pesanan</th>
-        <th>Total</th>
-      </tr>
-    </thead>
+<h2>Riwayat Transaksi</h2>
 
-    <tbody id="laporanBody"></tbody>
-  </table>
+<table>
+
+<thead>
+<tr>
+<th>Tanggal</th>
+<th>Metode</th>
+<th>Pesanan</th>
+<th>Total</th>
+</tr>
+</thead>
+
+<tbody id="laporanBody"></tbody>
+
+</table>
+
 </div>
 
-  </div>  <script>
-    let transaksi = JSON.parse(localStorage.getItem('transaksi')) || [];
+</div>
 
-    const laporanBody = document.getElementById('laporanBody');
+<script>
 
-    function rupiah(angka){
-      return 'Rp' + angka.toLocaleString('id-ID');
-    }
+const API_URL =
+"https://script.google.com/macros/s/AKfycbyB0_f8z2BV5szaA3tnEmwAD9UqjdU0A5d8TAVg-SuXTIoiGH7Y4yzfa99roTzpYS81/exec";
 
-    function renderLaporan(data){
-      laporanBody.innerHTML = '';
+let transaksi = [];
 
-      let omzet = 0;
-      let cash = 0;
-      let qris = 0;
+const laporanBody =
+document.getElementById('laporanBody');
 
-      data.reverse().forEach(item => {
+function rupiah(angka){
+return 'Rp' + angka.toLocaleString('id-ID');
+}
 
-        let total = 0;
-        let detail = '';
+async function loadData(){
 
-        item.items.forEach(menu => {
-          const subtotal = menu.harga * menu.qty;
-          total += subtotal;
+try{
 
-          detail += `
-            <div class="detail-item">
-              ${menu.nama} x${menu.qty}
-            </div>
-          `;
-        });
+const res =
+await fetch(API_URL + "?t=" + Date.now());
 
-        omzet += total;
+const data =
+await res.json();
 
-        if(item.metode === 'Cash'){
-          cash += total;
-        } else {
-          qris += total;
-        }
+transaksi = data;
 
-        laporanBody.innerHTML += `
-          <tr>
-            <td>${item.tanggal}</td>
-            <td class="${item.metode === 'Cash' ? 'cash' : 'qris'}">
-              ${item.metode}
-            </td>
-            <td>${detail}</td>
-            <td>${rupiah(total)}</td>
-          </tr>
-        `;
-      });
+renderLaporan([...transaksi]);
 
-      document.getElementById('totalTransaksi').innerText = data.length;
-      document.getElementById('totalOmzet').innerText = rupiah(omzet);
-      document.getElementById('cashTotal').innerText = rupiah(cash);
-      document.getElementById('qrisTotal').innerText = rupiah(qris);
-    }
+}catch(err){
 
-    renderLaporan([...transaksi]);
+console.log(err);
 
-    function filterData(metode){
-      if(metode === 'all'){
-        renderLaporan([...transaksi]);
-      } else {
-        const hasil = transaksi.filter(item => item.metode === metode);
-        renderLaporan([...hasil]);
-      }
-    }
-  </script></body>
+}
+
+}
+
+function renderLaporan(data){
+
+laporanBody.innerHTML='';
+
+let omzet=0;
+let cash=0;
+let qris=0;
+
+data.reverse().forEach(item=>{
+
+let total=0;
+let detail='';
+
+item.items.forEach(menu=>{
+
+const subtotal =
+menu.harga * menu.qty;
+
+total += subtotal;
+
+detail += `
+<div class="detail-item">
+${menu.nama} x${menu.qty}
+</div>
+`;
+
+});
+
+omzet += total;
+
+if(item.metode === 'Cash'){
+cash += total;
+}else{
+qris += total;
+}
+
+laporanBody.innerHTML += `
+<tr>
+
+<td>${item.tanggal}</td>
+
+<td class="${
+item.metode === 'Cash'
+? 'cash'
+: 'qris'
+}">
+${item.metode}
+</td>
+
+<td>${detail}</td>
+
+<td>${rupiah(total)}</td>
+
+</tr>
+`;
+
+});
+
+document.getElementById('totalTransaksi')
+.innerText = data.length;
+
+document.getElementById('totalOmzet')
+.innerText = rupiah(omzet);
+
+document.getElementById('cashTotal')
+.innerText = rupiah(cash);
+
+document.getElementById('qrisTotal')
+.innerText = rupiah(qris);
+
+}
+
+function filterData(metode){
+
+if(metode === 'all'){
+
+renderLaporan([...transaksi]);
+
+}else{
+
+const hasil =
+transaksi.filter(item =>
+item.metode === metode
+);
+
+renderLaporan([...hasil]);
+
+}
+
+}
+
+loadData();
+
+setInterval(loadData,5000);
+
+</script>
+
+</body>
 </html>

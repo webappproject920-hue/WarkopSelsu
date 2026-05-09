@@ -237,8 +237,11 @@ const grafik={};
 
 data.forEach(trx=>{
 
-const qty = Number(trx.qty) || 0;
-const total = Number(trx.total) || 0;
+const qty = parseInt(trx.qty) || 0;
+
+const total = parseInt(
+  String(trx.total).replace(/[^0-9]/g,'')
+) || 0;
 
 omzet += total;
 item += qty;

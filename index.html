@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Warkop SelSu & Zamore</title>
+<title>Dashboard Warkop Selsu & Zamore</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -76,6 +76,20 @@ padding:20px;border-radius:18px;color:white;
 
 .chart-box{
 background:white;padding:20px;border-radius:20px;
+margin-bottom:20px;
+}
+
+#topProfitMenu{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+gap:10px;
+margin-top:10px;
+}
+
+.top-item{
+background:#f9fafb;
+padding:12px;
+border-radius:10px;
 }
 </style>
 </head>
@@ -114,7 +128,6 @@ background:white;padding:20px;border-radius:20px;
 <div class="card purple">
 <h3>Pendapatan</h3>
 <h1 id="omzet">Rp0</h1>
-<p id="omzetCompare"></p>
 </div>
 
 <div class="card blue">
@@ -136,8 +149,18 @@ background:white;padding:20px;border-radius:20px;
 </div>
 
 <div class="chart-box">
-<h3>Trend Penjualan</h3>
+<h3>Trend Omzet</h3>
 <canvas id="chart"></canvas>
+</div>
+
+<div class="chart-box">
+<h3>Trend Laba Bersih</h3>
+<canvas id="profitChart"></canvas>
+</div>
+
+<div class="chart-box">
+<h3>Menu Paling Cuan</h3>
+<div id="topProfitMenu"></div>
 </div>
 
 </div>
@@ -149,32 +172,75 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyB0_f8z2BV5szaA3tnEmwA
 let transaksi = [];
 let currentFilter = 'daily';
 let selectedDate = null;
-let chart;
+let chart, profitChart;
 
-// mapping modal & harga jual
 const menuData = {
 "Nasi Telor Crispy":[6500,12000],
 "Nasi Goreng Kampung":[7500,15000],
 "Nasi Goreng Kecap":[7500,15000],
 "Rice Bowl":[8500,15000],
+"Snack Platter":[8500,15000],
+"Mie Nyemek Bangladesh":[9000,15000],
+"Mie Nyemek Jogja":[9000,15000],
+"Mie Rebus Telor":[6500,12000],
 "Mie Goreng Telor":[6500,12000],
 "Kentang Goreng":[5000,10000],
+"Bakso Goreng":[5000,10000],
+"Cireng Rujak":[4500,10000],
+"Mini Bakpao":[3500,10000],
+"Roti Bakar Coklat":[5500,10000],
+"Roti Bakar Keju":[5500,10000],
+"Roti Bakar Coklat Keju":[5500,10000],
+"Otak - Otak":[3000,10000],
+"Nasi":[2000,4000],
 "Air Mineral":[1500,5000],
+"Good Day Freeze":[3000,7000],
+"Good Day Cappucino":[3000,7000],
+"ABC Klepon":[3000,7000],
+"Bonteh Teh Tarik":[3000,7000],
+"Bonteh Matcha":[3000,7000],
+"Chocolatos Coklat":[3000,8000],
+"Chocolatos Matcha":[3000,8000],
+"Drink Beng Beng":[3000,8000],
+"Hilo Banana":[2500,8000],
+"Hilo Hazelnut":[2500,8000],
 "Nutrisari Jeruk":[2000,6000],
-"Brownbites":[8500,15000]
+"Nutrisari Leci":[2000,6000],
+"Josu":[2500,6000],
+"Luwak":[2000,7000],
+"Indocafe":[2000,7000],
+"Creamy Latte":[2000,7000],
+"Nescafe":[2000,6000],
+"Susu Coklat":[2500,7000],
+"Susu Putih":[2500,7000],
+"Wedang Bajigur":[2500,7000],
+"Kapal Api (Hot)":[2500,5000],
+"ABC Susu":[2500,5000],
+"Minuman All (Hot)":[2500,5000],
+"Pisang Nugget isi 4":[5500,10000],
+"Pisang Nugget isi 6":[8500,15000],
+"Basic Cookies":[1500,5000],
+"Cookies Cadbury":[5000,10000],
+"Cookies S'Mores":[5000,10000],
+"Cookies Cheese":[5000,10000],
+"Lotus Biscoff":[7000,12000],
+"Brownbites":[8500,15000],
+"Brownies Lumer":[8500,15000],
+"Brownies Chruncy":[8500,15000],
+"Brownies Cream Cheese":[10000,15000],
+"Dessert Platter":[10000,15000]
 };
 
 function rupiah(n){
 return 'Rp' + Number(n).toLocaleString('id-ID');
 }
 
-// FILTER
 function setFilter(f){
-selectedDate = null;
-currentFilter = f;
+selectedDate=null;
+currentFilter=f;
 
 document.querySelectorAll('.filter button')
-.forEach(btn=>btn.classList.remove('active'));
+.forEach(b=>b.classList.remove('active'));
 
 document.getElementById(
 f==='daily'?'btnDaily':
@@ -184,134 +250,138 @@ f==='weekly'?'btnWeekly':'btnMonthly'
 render();
 }
 
-function filterTanggal(date){
-selectedDate = date;
+function filterTanggal(d){
+selectedDate=d;
 render();
 }
 
 function resetFilter(){
-selectedDate = null;
+selectedDate=null;
 render();
 }
 
 function getFilteredData(){
 
 if(selectedDate){
-return transaksi.filter(trx=>{
-const d = new Date(trx.tanggal).toISOString().split('T')[0];
-return d === selectedDate;
-});
+return transaksi.filter(t=>
+new Date(t.tanggal).toISOString().split('T')[0]===selectedDate
+);
 }
 
-const now = new Date();
+const now=new Date();
 
-return transaksi.filter(trx=>{
+return transaksi.filter(t=>{
+const d=new Date(t.tanggal);
 
-const t = new Date(trx.tanggal);
-
-if(currentFilter==='daily'){
-return t.toDateString() === now.toDateString();
-}
+if(currentFilter==='daily')
+return d.toDateString()===now.toDateString();
 
 if(currentFilter==='weekly'){
-const w = new Date();
+const w=new Date();
 w.setDate(now.getDate()-7);
-return t >= w;
+return d>=w;
 }
 
-if(currentFilter==='monthly'){
-return t.getMonth() === now.getMonth();
-}
+if(currentFilter==='monthly')
+return d.getMonth()===now.getMonth();
 
 });
 }
 
-// RENDER
 function render(){
 
-const data = getFilteredData();
+const data=getFilteredData();
 
-let omzet=0, item=0, profit=0;
-
-const grafik={};
+let omzet=0,item=0,profit=0;
+const grafik={},grafikProfit={},profitMenu={};
 
 data.forEach(trx=>{
 
-const qty = parseInt(trx.qty) || 0;
+const qty=Number(trx.qty)||0;
+const total=Number(trx.total)||0;
 
-const total = parseInt(
-  String(trx.total).replace(/[^0-9]/g,'')
-) || 0;
+omzet+=total;
+item+=qty;
 
-omzet += total;
-item += qty;
+let p=0;
 
 if(menuData[trx.menu]){
-const [m,j] = menuData[trx.menu];
-profit += (j-m)*qty;
+const [m,j]=menuData[trx.menu];
+p=(j-m)*qty;
+profit+=p;
+profitMenu[trx.menu]=(profitMenu[trx.menu]||0)+p;
 }
 
-const d = new Date(trx.tanggal)
+const d=new Date(trx.tanggal)
 .toLocaleDateString('id-ID');
 
-grafik[d] = (grafik[d] || 0) + total;
+grafik[d]=(grafik[d]||0)+total;
+grafikProfit[d]=(grafikProfit[d]||0)+p;
 
 });
 
-// tampil
-document.getElementById('omzet').innerText = rupiah(omzet);
-document.getElementById('trx').innerText = data.length;
-document.getElementById('profit').innerText = rupiah(profit);
-document.getElementById('item').innerText = item;
+document.getElementById('omzet').innerText=rupiah(omzet);
+document.getElementById('trx').innerText=data.length;
+document.getElementById('profit').innerText=rupiah(profit);
+document.getElementById('item').innerText=item;
 
-// ===== BANDUNGAN KEMARIN =====
-const yesterday = new Date();
-yesterday.setDate(yesterday.getDate()-1);
-
-const yData = transaksi.filter(t=>{
-return new Date(t.tanggal).toDateString() === yesterday.toDateString();
-});
+// compare kemarin
+const y=new Date(); y.setDate(y.getDate()-1);
 
 let yProfit=0;
 
-yData.forEach(trx=>{
-if(menuData[trx.menu]){
-const [m,j]=menuData[trx.menu];
-yProfit += (j-m)*trx.qty;
+transaksi.forEach(t=>{
+if(new Date(t.tanggal).toDateString()===y.toDateString()){
+const qty=Number(t.qty)||0;
+if(menuData[t.menu]){
+const [m,j]=menuData[t.menu];
+yProfit+=(j-m)*qty;
+}
 }
 });
 
-let percent = yProfit>0 ? ((profit-yProfit)/yProfit*100) : 0;
+let percent=yProfit>0?((profit-yProfit)/yProfit*100):0;
 
-document.getElementById('profitCompare').innerHTML =
+document.getElementById('profitCompare').innerHTML=
 `${percent>=0?'▲':'▼'} ${Math.abs(percent).toFixed(1)}% vs kemarin`;
 
-// CHART
 if(chart) chart.destroy();
 
-chart = new Chart(document.getElementById('chart'),{
+chart=new Chart(document.getElementById('chart'),{
 type:'line',
-data:{
-labels:Object.keys(grafik),
-datasets:[{
-data:Object.values(grafik),
-borderWidth:3,
-tension:0.4
-}]
-}
+data:{labels:Object.keys(grafik),
+datasets:[{data:Object.values(grafik),borderWidth:3,tension:.4}]}
+});
+
+if(profitChart) profitChart.destroy();
+
+profitChart=new Chart(document.getElementById('profitChart'),{
+type:'line',
+data:{labels:Object.keys(grafikProfit),
+datasets:[{data:Object.values(grafikProfit),borderWidth:3,tension:.4}]}
+});
+
+const top=Object.entries(profitMenu)
+.sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+const div=document.getElementById('topProfitMenu');
+div.innerHTML="";
+
+top.forEach(i=>{
+div.innerHTML+=`
+<div class="top-item">
+<b>${i[0]}</b><br>${rupiah(i[1])}
+</div>`;
 });
 
 }
 
-// LOAD
 async function load(){
 try{
-const res = await fetch(API_URL + "?t=" + Date.now());
-transaksi = await res.json();
+const res=await fetch(API_URL+"?t="+Date.now());
+transaksi=await res.json();
 render();
-}catch(e){
-console.log(e);
-}
+}catch(e){console.log(e);}
 }
 
 load();

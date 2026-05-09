@@ -270,15 +270,22 @@ const API_URL =
 
 let transaksi = [];
 
+  <script>
+localStorage.removeItem('transaksi');
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycbyB0_f8z2BV5szaA3tnEmwAD9UqjdU0A5d8TAVg-SuXTIoiGH7Y4yzfa99roTzpYS81/exec";
+
+let transaksi = [];
+
 const laporanBody =
 document.getElementById('laporanBody');
 
 function rupiah(angka){
-return 'Rp' + angka.toLocaleString('id-ID');
+return 'Rp' + Number(angka).toLocaleString('id-ID');
 }
 
 async function loadData(){
-
 try{
 
 const res =
@@ -287,16 +294,15 @@ await fetch(API_URL + "?t=" + Date.now());
 const data =
 await res.json();
 
+console.log("DATA MASUK:", data); // DEBUG
+
 transaksi = data;
 
-renderLaporan([...transaksi]);
+renderLaporan(transaksi);
 
 }catch(err){
-
-console.log(err);
-
+console.log("ERROR:", err);
 }
-
 }
 
 function renderLaporan(data){
@@ -307,21 +313,28 @@ let omzet=0;
 let cash=0;
 let qris=0;
 
-data.reverse().forEach(item=>{
+data
+.slice() // 🔥 penting biar ga ngerusak data asli
+.sort((a,b)=> new Date(b.tanggal) - new Date(a.tanggal))
+.forEach(item=>{
 
 let total=0;
 let detail='';
 
+if(!item.items) return;
+
 item.items.forEach(menu=>{
 
-const subtotal =
-menu.harga * menu.qty;
+const harga = Number(menu.harga) || 0;
+const qty = Number(menu.qty) || 0;
+
+const subtotal = harga * qty;
 
 total += subtotal;
 
 detail += `
 <div class="detail-item">
-${menu.nama} x${menu.qty}
+${menu.nama} x${qty}
 </div>
 `;
 
@@ -338,7 +351,7 @@ qris += total;
 laporanBody.innerHTML += `
 <tr>
 
-<td>${item.tanggal}</td>
+<td>${new Date(item.tanggal).toLocaleString('id-ID')}</td>
 
 <td class="${
 item.metode === 'Cash'
@@ -374,26 +387,19 @@ document.getElementById('qrisTotal')
 function filterData(metode){
 
 if(metode === 'all'){
-
-renderLaporan([...transaksi]);
-
+renderLaporan(transaksi);
 }else{
-
 const hasil =
 transaksi.filter(item =>
 item.metode === metode
 );
-
-renderLaporan([...hasil]);
-
+renderLaporan(hasil);
 }
 
 }
 
 loadData();
-
 setInterval(loadData,5000);
-
 </script>
 
 </body>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Warkop SelSu & Zamore</title>
+<title>WARKOP SELSU & ZAMORE</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -19,7 +19,7 @@ position:fixed;
 
 .logo{
 font-size:26px;font-weight:bold;
-color:#4f46e5;margin-bottom:30px;
+color:#e63946;margin-bottom:30px;
 }
 
 .menu button{
@@ -29,7 +29,7 @@ background:#f1f1f1;cursor:pointer;
 }
 
 .menu button.active{
-background:#4f46e5;color:white;
+background:#e63946;color:white;
 }
 
 .main{
@@ -53,7 +53,7 @@ background:#fff;border:1px solid #ddd;
 }
 
 .filter button.active{
-background:#4f46e5;color:white;
+background:#e63946;color:white;
 }
 
 .cards{
@@ -69,27 +69,13 @@ padding:20px;border-radius:18px;color:white;
 .card h3{font-size:14px;margin-bottom:8px;}
 .card h1{font-size:24px;}
 
-.purple{background:linear-gradient(45deg,#6366f1,#4f46e5);}
-.blue{background:linear-gradient(45deg,#06b6d4,#0ea5e9);}
-.green{background:linear-gradient(45deg,#10b981,#059669);}
 .red{background:linear-gradient(45deg,#ef4444,#dc2626);}
+.dark{background:linear-gradient(45deg,#222,#444);}
+.green{background:linear-gradient(45deg,#10b981,#059669);}
+.blue{background:linear-gradient(45deg,#06b6d4,#0ea5e9);}
 
 .chart-box{
 background:white;padding:20px;border-radius:20px;
-margin-bottom:20px;
-}
-
-#topProfitMenu{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-gap:10px;
-margin-top:10px;
-}
-
-.top-item{
-background:#f9fafb;
-padding:12px;
-border-radius:10px;
 }
 </style>
 </head>
@@ -97,7 +83,7 @@ border-radius:10px;
 <body>
 
 <div class="sidebar">
-<div class="logo">Warkop Selsu & Zamore</div>
+<div class="logo">WARKOP SELSU & ZAMORE</div>
 
 <div class="menu">
 <button class="active">Dashboard</button>
@@ -109,7 +95,6 @@ border-radius:10px;
 <div class="main">
 
 <div class="topbar">
-
 <h2>Dashboard</h2>
 
 <div class="filter">
@@ -120,17 +105,16 @@ border-radius:10px;
 <input type="date" onchange="filterTanggal(this.value)">
 <button onclick="resetFilter()">Reset</button>
 </div>
-
 </div>
 
 <div class="cards">
 
-<div class="card purple">
+<div class="card red">
 <h3>Pendapatan</h3>
 <h1 id="omzet">Rp0</h1>
 </div>
 
-<div class="card blue">
+<div class="card dark">
 <h3>Total Transaksi</h3>
 <h1 id="trx">0</h1>
 </div>
@@ -138,10 +122,9 @@ border-radius:10px;
 <div class="card green">
 <h3>Laba Bersih</h3>
 <h1 id="profit">Rp0</h1>
-<p id="profitCompare"></p>
 </div>
 
-<div class="card red">
+<div class="card blue">
 <h3>Total Item</h3>
 <h1 id="item">0</h1>
 </div>
@@ -149,18 +132,8 @@ border-radius:10px;
 </div>
 
 <div class="chart-box">
-<h3>Trend Omzet</h3>
+<h3>Trend Omzet vs Laba</h3>
 <canvas id="chart"></canvas>
-</div>
-
-<div class="chart-box">
-<h3>Trend Laba Bersih</h3>
-<canvas id="profitChart"></canvas>
-</div>
-
-<div class="chart-box">
-<h3>Menu Paling Cuan</h3>
-<div id="topProfitMenu"></div>
 </div>
 
 </div>
@@ -172,8 +145,9 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyB0_f8z2BV5szaA3tnEmwA
 let transaksi = [];
 let currentFilter = 'daily';
 let selectedDate = null;
-let chart, profitChart;
+let chart;
 
+// 🔥 FULL MENU DATA (LENGKAP)
 const menuData = {
 "Nasi Telor Crispy":[6500,12000],
 "Nasi Goreng Kampung":[7500,15000],
@@ -213,7 +187,6 @@ const menuData = {
 "Nescafe":[2000,6000],
 "Susu Coklat":[2500,7000],
 "Susu Putih":[2500,7000],
-"Wedang Bajigur":[2500,7000],
 "Kapal Api (Hot)":[2500,5000],
 "ABC Susu":[2500,5000],
 "Minuman All (Hot)":[2500,5000],
@@ -231,25 +204,19 @@ const menuData = {
 "Dessert Platter":[10000,15000]
 };
 
-// ✅ FIX DATE PARSER
-function parseTanggal(str){
-if(!str) return new Date();
-
-if(str.includes('/')){
-const parts = str.split(' ')[0].split('/');
-return new Date(parts[2], parts[1]-1, parts[0]);
-}
-
-return new Date(str);
-}
-
 function rupiah(n){
 return 'Rp' + Number(n).toLocaleString('id-ID');
 }
 
+// 🔥 FIX TIMEZONE
+function toLocalDate(d){
+return new Date(d).toLocaleDateString('id-ID');
+}
+
+// FILTER
 function setFilter(f){
-selectedDate=null;
-currentFilter=f;
+selectedDate = null;
+currentFilter = f;
 
 document.querySelectorAll('.filter button')
 .forEach(b=>b.classList.remove('active'));
@@ -263,7 +230,7 @@ render();
 }
 
 function filterTanggal(d){
-selectedDate=d;
+selectedDate = d;
 render();
 }
 
@@ -272,133 +239,106 @@ selectedDate=null;
 render();
 }
 
-function getFilteredData(){
+function getFiltered(){
 
 if(selectedDate){
 return transaksi.filter(t=>{
-const d = parseTanggal(t.tanggal);
-const iso = d.getFullYear() + '-' +
-String(d.getMonth()+1).padStart(2,'0') + '-' +
-String(d.getDate()).padStart(2,'0');
-
-return iso === selectedDate;
+return new Date(t.tanggal)
+.toISOString().split('T')[0] === selectedDate;
 });
 }
 
-const now=new Date();
+const now = new Date();
 
 return transaksi.filter(t=>{
-const d=parseTanggal(t.tanggal);
+const d = new Date(t.tanggal);
 
-if(currentFilter==='daily')
-return d.toDateString()===now.toDateString();
-
-if(currentFilter==='weekly'){
-const w=new Date();
-w.setDate(now.getDate()-7);
-return d>=w;
+if(currentFilter==='daily'){
+return toLocalDate(d) === toLocalDate(now);
 }
 
-if(currentFilter==='monthly')
-return d.getMonth()===now.getMonth();
+if(currentFilter==='weekly'){
+let w = new Date();
+w.setDate(now.getDate()-7);
+return d >= w;
+}
 
+if(currentFilter==='monthly'){
+return d.getMonth() === now.getMonth();
+}
 });
 }
 
+// RENDER
 function render(){
 
-const data=getFilteredData();
+const data = getFiltered();
 
-let omzet=0,item=0,profit=0;
-const grafik={},grafikProfit={},profitMenu={};
+let omzet=0, item=0, profit=0;
+const grafikOmzet={}, grafikProfit={};
 
 data.forEach(trx=>{
 
-const qty=Number(trx.qty)||0;
-const total=Number(trx.total)||0;
+const qty = Number(trx.qty) || 0;
+const total = Number(trx.total) || 0;
 
-omzet+=total;
-item+=qty;
-
-let p=0;
+omzet += total;
+item += qty;
 
 if(menuData[trx.menu]){
 const [m,j]=menuData[trx.menu];
-p=(j-m)*qty;
-profit+=p;
-profitMenu[trx.menu]=(profitMenu[trx.menu]||0)+p;
+profit += (j-m)*qty;
 }
 
-const d=parseTanggal(trx.tanggal)
-.toLocaleDateString('id-ID');
+const d = toLocalDate(trx.tanggal);
 
-grafik[d]=(grafik[d]||0)+total;
-grafikProfit[d]=(grafikProfit[d]||0)+p;
+grafikOmzet[d]=(grafikOmzet[d]||0)+total;
+
+if(menuData[trx.menu]){
+const [m,j]=menuData[trx.menu];
+grafikProfit[d]=(grafikProfit[d]||0)+((j-m)*qty);
+}
 
 });
 
-document.getElementById('omzet').innerText=rupiah(omzet);
-document.getElementById('trx').innerText=data.length;
-document.getElementById('profit').innerText=rupiah(profit);
-document.getElementById('item').innerText=item;
+document.getElementById('omzet').innerText = rupiah(omzet);
+document.getElementById('trx').innerText = data.length;
+document.getElementById('profit').innerText = rupiah(profit);
+document.getElementById('item').innerText = item;
 
-// compare kemarin
-const y=new Date(); y.setDate(y.getDate()-1);
-
-let yProfit=0;
-
-transaksi.forEach(t=>{
-if(parseTanggal(t.tanggal).toDateString()===y.toDateString()){
-const qty=Number(t.qty)||0;
-if(menuData[t.menu]){
-const [m,j]=menuData[t.menu];
-yProfit+=(j-m)*qty;
-}
-}
-});
-
-let percent=yProfit>0?((profit-yProfit)/yProfit*100):0;
-
-document.getElementById('profitCompare').innerHTML=
-`${percent>=0?'▲':'▼'} ${Math.abs(percent).toFixed(1)}% vs kemarin`;
-
+// CHART
 if(chart) chart.destroy();
 
-chart=new Chart(document.getElementById('chart'),{
+chart = new Chart(document.getElementById('chart'),{
 type:'line',
-data:{labels:Object.keys(grafik),
-datasets:[{data:Object.values(grafik),borderWidth:3,tension:.4}]}
-});
-
-if(profitChart) profitChart.destroy();
-
-profitChart=new Chart(document.getElementById('profitChart'),{
-type:'line',
-data:{labels:Object.keys(grafikProfit),
-datasets:[{data:Object.values(grafikProfit),borderWidth:3,tension:.4}]}
-});
-
-const top=Object.entries(profitMenu)
-.sort((a,b)=>b[1]-a[1]).slice(0,5);
-
-const div=document.getElementById('topProfitMenu');
-div.innerHTML="";
-
-top.forEach(i=>{
-div.innerHTML+=`
-<div class="top-item">
-<b>${i[0]}</b><br>${rupiah(i[1])}
-</div>`;
+data:{
+labels:Object.keys(grafikOmzet),
+datasets:[
+{
+label:'Omzet',
+data:Object.values(grafikOmzet),
+borderWidth:3
+},
+{
+label:'Laba',
+data:Object.values(grafikProfit),
+borderWidth:3
+}
+]
+}
 });
 
 }
 
+// LOAD
 async function load(){
 try{
-const res=await fetch(API_URL+"?t="+Date.now());
-transaksi=await res.json();
+const res = await fetch(API_URL + "?t=" + Date.now());
+transaksi = await res.json();
 render();
-}catch(e){console.log(e);}
+}catch(e){
+console.log(e);
+}
 }
 
 load();

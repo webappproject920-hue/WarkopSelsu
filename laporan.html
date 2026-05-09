@@ -3,62 +3,59 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Laporan Warkop POS</title>
+
+<title>Laporan Warkop</title>
 
 <style>
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:Arial,sans-serif;
+font-family:Arial;
 }
 
 body{
-background:#f4f5f7;
+background:#f5f6fa;
 display:flex;
-min-height:100vh;
 color:#222;
 }
 
 .sidebar{
-width:230px;
-background:white;
+width:240px;
+background:#fff;
+height:100vh;
 padding:20px;
 border-right:1px solid #eee;
+position:fixed;
 }
 
 .logo{
-font-size:28px;
+font-size:26px;
 font-weight:bold;
 color:#e63946;
 margin-bottom:30px;
 }
 
-.menu{
-display:flex;
-flex-direction:column;
-gap:12px;
-}
-
 .menu button{
+display:block;
+width:100%;
+margin-bottom:10px;
+padding:12px;
 border:none;
-padding:14px;
-border-radius:12px;
-background:#f3f3f3;
+border-radius:10px;
+background:#f1f1f1;
 cursor:pointer;
-text-align:left;
-transition:.2s;
 }
 
-.menu button.active,
-.menu button:hover{
+.menu button.active{
 background:#e63946;
 color:white;
 }
 
 .main{
-flex:1;
+margin-left:260px;
 padding:20px;
+width:100%;
 }
 
 .topbar{
@@ -70,57 +67,77 @@ flex-wrap:wrap;
 gap:10px;
 }
 
-.filter-group{
+.filter{
 display:flex;
 gap:10px;
+flex-wrap:wrap;
+align-items:center;
 }
 
-.filter-group button{
-padding:12px 16px;
+.filter button,
+.filter input{
+padding:10px 14px;
 border:none;
 border-radius:10px;
-background:white;
-border:1px solid #ddd;
 cursor:pointer;
+background:#fff;
+border:1px solid #ddd;
+}
+
+.filter button.active{
+background:#e63946;
+color:white;
 }
 
 .cards{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:20px;
+gap:15px;
 margin-bottom:20px;
 }
 
 .card{
-background:white;
-border-radius:20px;
 padding:20px;
-box-shadow:0 2px 8px rgba(0,0,0,.05);
+border-radius:18px;
+color:white;
 }
 
 .card h3{
-margin-bottom:10px;
-color:#666;
-font-size:15px;
+font-size:14px;
+margin-bottom:8px;
 }
 
 .card h1{
-color:#e63946;
-font-size:28px;
+font-size:24px;
+}
+
+.red{
+background:linear-gradient(45deg,#ef4444,#dc2626);
+}
+
+.dark{
+background:linear-gradient(45deg,#222,#444);
+}
+
+.green{
+background:linear-gradient(45deg,#10b981,#059669);
+}
+
+.blue{
+background:linear-gradient(45deg,#06b6d4,#0ea5e9);
 }
 
 .table-box{
 background:white;
-border-radius:20px;
 padding:20px;
-overflow-x:auto;
-box-shadow:0 2px 8px rgba(0,0,0,.05);
+border-radius:20px;
+overflow:auto;
 }
 
 table{
 width:100%;
 border-collapse:collapse;
-margin-top:20px;
+margin-top:15px;
 }
 
 th,td{
@@ -135,24 +152,23 @@ background:#fafafa;
 }
 
 .cash{
-color:#222;
 font-weight:bold;
+color:#222;
 }
 
 .qris{
-color:#e63946;
 font-weight:bold;
-}
-
-.detail-item{
-margin-bottom:6px;
-font-size:13px;
+color:#e63946;
 }
 
 @media(max-width:900px){
 
 .sidebar{
 display:none;
+}
+
+.main{
+margin-left:0;
 }
 
 }
@@ -163,10 +179,11 @@ display:none;
 
 <div class="sidebar">
 
-<div class="logo">Warkop POS</div>
+<div class="logo">
+WARKOP SELSU & ZAMORE
+</div>
 
 <div class="menu">
-
 <button onclick="location.href='index.html'">
 Dashboard
 </button>
@@ -175,18 +192,9 @@ Dashboard
 Kasir
 </button>
 
-<button>
-Produk
-</button>
-
-<button>
-Statistik
-</button>
-
 <button class="active">
 Laporan
 </button>
-
 </div>
 
 </div>
@@ -195,20 +203,26 @@ Laporan
 
 <div class="topbar">
 
-<h1>Laporan Penjualan</h1>
+<h2>Laporan Penjualan</h2>
 
-<div class="filter-group">
+<div class="filter">
 
-<button onclick="filterData('all')">
+<button onclick="filterData('all')" class="active" id="allBtn">
 Semua
 </button>
 
-<button onclick="filterData('Cash')">
+<button onclick="filterData('Cash')" id="cashBtn">
 Cash
 </button>
 
-<button onclick="filterData('QRIS')">
+<button onclick="filterData('QRIS')" id="qrisBtn">
 QRIS
+</button>
+
+<input type="date" id="tanggalFilter" onchange="filterTanggal(this.value)">
+
+<button onclick="resetFilter()">
+Reset
 </button>
 
 </div>
@@ -217,23 +231,23 @@ QRIS
 
 <div class="cards">
 
-<div class="card">
-<h3>Total Transaksi</h3>
-<h1 id="totalTransaksi">0</h1>
-</div>
-
-<div class="card">
+<div class="card red">
 <h3>Total Omzet</h3>
-<h1 id="totalOmzet">Rp0</h1>
+<h1 id="omzet">Rp0</h1>
 </div>
 
-<div class="card">
-<h3>Pembayaran Cash</h3>
+<div class="card dark">
+<h3>Total Transaksi</h3>
+<h1 id="trx">0</h1>
+</div>
+
+<div class="card green">
+<h3>Total Cash</h3>
 <h1 id="cashTotal">Rp0</h1>
 </div>
 
-<div class="card">
-<h3>Pembayaran QRIS</h3>
+<div class="card blue">
+<h3>Total QRIS</h3>
 <h1 id="qrisTotal">Rp0</h1>
 </div>
 
@@ -241,15 +255,16 @@ QRIS
 
 <div class="table-box">
 
-<h2>Riwayat Transaksi</h2>
+<h3>Riwayat Transaksi</h3>
 
 <table>
 
 <thead>
 <tr>
 <th>Tanggal</th>
+<th>Menu</th>
+<th>Qty</th>
 <th>Metode</th>
-<th>Pesanan</th>
 <th>Total</th>
 </tr>
 </thead>
@@ -263,46 +278,39 @@ QRIS
 </div>
 
 <script>
-  localStorage.removeItem('transaksi');
 
 const API_URL =
 "https://script.google.com/macros/s/AKfycbyB0_f8z2BV5szaA3tnEmwAD9UqjdU0A5d8TAVg-SuXTIoiGH7Y4yzfa99roTzpYS81/exec";
 
 let transaksi = [];
-
-  <script>
-localStorage.removeItem('transaksi');
-
-const API_URL =
-"https://script.google.com/macros/s/AKfycbyB0_f8z2BV5szaA3tnEmwAD9UqjdU0A5d8TAVg-SuXTIoiGH7Y4yzfa99roTzpYS81/exec";
-
-let transaksi = [];
+let currentMetode = 'all';
+let selectedDate = null;
 
 const laporanBody =
 document.getElementById('laporanBody');
 
-function rupiah(angka){
-return 'Rp' + Number(angka).toLocaleString('id-ID');
+function rupiah(n){
+return 'Rp' + Number(n).toLocaleString('id-ID');
 }
 
 async function loadData(){
+
 try{
 
 const res =
 await fetch(API_URL + "?t=" + Date.now());
 
-const data =
+transaksi =
 await res.json();
 
-console.log("DATA MASUK:", data); // DEBUG
-
-transaksi = data;
-
-renderLaporan(transaksi);
+applyFilters();
 
 }catch(err){
-console.log("ERROR:", err);
+
+console.log(err);
+
 }
+
 }
 
 function renderLaporan(data){
@@ -314,31 +322,17 @@ let cash=0;
 let qris=0;
 
 data
-.slice() // 🔥 penting biar ga ngerusak data asli
-.sort((a,b)=> new Date(b.tanggal) - new Date(a.tanggal))
+.slice()
+.sort((a,b)=>
+new Date(b.tanggal) - new Date(a.tanggal)
+)
 .forEach(item=>{
 
-let total=0;
-let detail='';
+const total =
+Number(item.total) || 0;
 
-if(!item.items) return;
-
-item.items.forEach(menu=>{
-
-const harga = Number(menu.harga) || 0;
-const qty = Number(menu.qty) || 0;
-
-const subtotal = harga * qty;
-
-total += subtotal;
-
-detail += `
-<div class="detail-item">
-${menu.nama} x${qty}
-</div>
-`;
-
-});
+const qty =
+Number(item.qty) || 0;
 
 omzet += total;
 
@@ -351,7 +345,14 @@ qris += total;
 laporanBody.innerHTML += `
 <tr>
 
-<td>${new Date(item.tanggal).toLocaleString('id-ID')}</td>
+<td>
+${new Date(item.tanggal)
+.toLocaleString('id-ID')}
+</td>
+
+<td>${item.menu}</td>
+
+<td>${qty}</td>
 
 <td class="${
 item.metode === 'Cash'
@@ -361,8 +362,6 @@ item.metode === 'Cash'
 ${item.metode}
 </td>
 
-<td>${detail}</td>
-
 <td>${rupiah(total)}</td>
 
 </tr>
@@ -370,11 +369,11 @@ ${item.metode}
 
 });
 
-document.getElementById('totalTransaksi')
-.innerText = data.length;
-
-document.getElementById('totalOmzet')
+document.getElementById('omzet')
 .innerText = rupiah(omzet);
+
+document.getElementById('trx')
+.innerText = data.length;
 
 document.getElementById('cashTotal')
 .innerText = rupiah(cash);
@@ -386,20 +385,98 @@ document.getElementById('qrisTotal')
 
 function filterData(metode){
 
-if(metode === 'all'){
-renderLaporan(transaksi);
-}else{
-const hasil =
-transaksi.filter(item =>
-item.metode === metode
+currentMetode = metode;
+
+document
+.querySelectorAll('.filter button')
+.forEach(btn=>
+btn.classList.remove('active')
 );
-renderLaporan(hasil);
+
+if(metode==='all'){
+
+document.getElementById('allBtn')
+.classList.add('active');
+
+}else if(metode==='Cash'){
+
+document.getElementById('cashBtn')
+.classList.add('active');
+
+}else{
+
+document.getElementById('qrisBtn')
+.classList.add('active');
+
 }
+
+applyFilters();
+
+}
+
+function filterTanggal(tanggal){
+
+selectedDate = tanggal;
+
+applyFilters();
+
+}
+
+function resetFilter(){
+
+selectedDate = null;
+currentMetode = 'all';
+
+document.getElementById('tanggalFilter').value='';
+
+document
+.querySelectorAll('.filter button')
+.forEach(btn=>
+btn.classList.remove('active')
+);
+
+document.getElementById('allBtn')
+.classList.add('active');
+
+renderLaporan(transaksi);
+
+}
+
+function applyFilters(){
+
+let hasil = transaksi;
+
+if(currentMetode !== 'all'){
+
+hasil = hasil.filter(item =>
+item.metode === currentMetode
+);
+
+}
+
+if(selectedDate){
+
+hasil = hasil.filter(item => {
+
+const tgl =
+new Date(item.tanggal)
+.toISOString()
+.split('T')[0];
+
+return tgl === selectedDate;
+
+});
+
+}
+
+renderLaporan(hasil);
 
 }
 
 loadData();
+
 setInterval(loadData,5000);
+
 </script>
 
 </body>

@@ -2,8 +2,6 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-
-<!-- MOBILE & IPHONE FIX -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
 <title>WARKOP SELSU & ZAMORE</title>
@@ -31,7 +29,7 @@ display:flex;
 color:#222;
 }
 
-/* ================= SIDEBAR ================= */
+/* SIDEBAR */
 
 .sidebar{
 width:240px;
@@ -75,7 +73,7 @@ color:white;
 box-shadow:0 6px 15px rgba(239,68,68,0.3);
 }
 
-/* ================= MAIN ================= */
+/* MAIN */
 
 .main{
 margin-left:260px;
@@ -85,7 +83,7 @@ max-width:100%;
 overflow-x:hidden;
 }
 
-/* ================= MODERN TOPBAR ================= */
+/* HERO */
 
 .hero{
 position:relative;
@@ -116,11 +114,12 @@ text-align:center;
 
 .hero-content img{
 width:100%;
-max-width:850px;
-margin:auto;
+max-width:100%;
+height:auto;
 display:block;
+margin:auto;
 object-fit:contain;
-filter:drop-shadow(0 5px 12px rgba(0,0,0,0.3));
+border-radius:18px;
 }
 
 .hero-text{
@@ -139,7 +138,7 @@ font-size:15px;
 color:rgba(255,255,255,0.85);
 }
 
-/* ================= TOPBAR ================= */
+/* TOPBAR */
 
 .topbar{
 display:flex;
@@ -155,7 +154,7 @@ font-size:28px;
 font-weight:700;
 }
 
-/* ================= FILTER ================= */
+/* FILTER */
 
 .filter{
 display:flex;
@@ -175,17 +174,13 @@ font-weight:600;
 transition:0.2s;
 }
 
-.filter button:hover{
-transform:translateY(-2px);
-}
-
 .filter button.active{
 background:linear-gradient(45deg,#ef4444,#dc2626);
 color:white;
 border:none;
 }
 
-/* ================= CARDS ================= */
+/* CARDS */
 
 .cards{
 display:grid;
@@ -246,7 +241,7 @@ background:linear-gradient(45deg,#10b981,#059669);
 background:linear-gradient(45deg,#06b6d4,#0ea5e9);
 }
 
-/* ================= CHART ================= */
+/* CHART */
 
 .chart-box{
 background:white;
@@ -254,6 +249,7 @@ padding:25px;
 border-radius:28px;
 box-shadow:0 10px 25px rgba(0,0,0,0.06);
 overflow:hidden;
+margin-bottom:20px;
 }
 
 .chart-box h3{
@@ -261,7 +257,7 @@ margin-bottom:20px;
 font-size:18px;
 }
 
-/* ================= MOBILE ================= */
+/* MOBILE */
 
 @media(max-width:900px){
 
@@ -301,28 +297,12 @@ margin-left:0;
 padding:15px;
 }
 
-.hero{
-border-radius:22px;
-}
-
-.hero-content{
-padding:18px;
-}
-
-.hero-text h1{
-font-size:24px;
-}
-
-.hero-text p{
-font-size:13px;
-}
-
 .topbar{
 flex-direction:column;
 align-items:flex-start;
 }
 
-.topbar h2{
+.hero-text h1{
 font-size:24px;
 }
 
@@ -337,56 +317,11 @@ min-width:120px;
 font-size:14px;
 }
 
-.card h1{
-font-size:24px;
 }
-
-.chart-box{
-padding:18px;
-border-radius:22px;
-}
-
-}
-
-/* ================= SMALL PHONE ================= */
-
-@media(max-width:480px){
-
-.cards{
-grid-template-columns:1fr;
-}
-
-.hero-text h1{
-font-size:20px;
-}
-
-.hero-text p{
-font-size:12px;
-}
-
-.filter{
-display:grid;
-grid-template-columns:1fr 1fr;
-width:100%;
-}
-
-.filter input{
-grid-column:span 2;
-}
-
-}
-
-/* ================= IOS SAFARI FIX ================= */
 
 canvas{
 max-width:100% !important;
 height:auto !important;
-display:block;
-}
-
-img{
-max-width:100%;
-height:auto;
 display:block;
 }
 
@@ -412,6 +347,7 @@ WARKOP SELSU & ZAMORE
 <div class="main">
 
 <!-- HERO -->
+
 <div class="hero">
 
 <div class="hero-overlay"></div>
@@ -421,33 +357,47 @@ WARKOP SELSU & ZAMORE
 <img src="logo-warkop.png" alt="Logo Warkop">
 
 <div class="hero-text">
-<h1>Dashboard Kas Modern</h1>
-<p>Selamat Sukses • POS Warkop Premium</p>
+<h1>Dashboard Warkop POS</h1>
+<p>Selamat Sukses • Zamore Dessert</p>
 </div>
 
 </div>
 
 </div>
+
+<!-- TOPBAR -->
 
 <div class="topbar">
 
 <h2>Dashboard</h2>
 
 <div class="filter">
-<button onclick="setFilter('daily')" id="btnDaily" class="active">Daily</button>
 
-<button onclick="setFilter('weekly')" id="btnWeekly">Weekly</button>
+<button onclick="setFilter('daily')" id="btnDaily" class="active">
+Daily
+</button>
 
-<button onclick="setFilter('monthly')" id="btnMonthly">Monthly</button>
+<button onclick="setFilter('weekly')" id="btnWeekly">
+Weekly
+</button>
+
+<button onclick="setFilter('monthly')" id="btnMonthly">
+Monthly
+</button>
 
 <input type="date" onchange="filterTanggal(this.value)">
 <input type="week" onchange="filterMinggu(this.value)">
 <input type="month" onchange="filterBulan(this.value)">
 
-<button onclick="resetFilter()">Reset</button>
+<button onclick="resetFilter()">
+Reset
+</button>
+
 </div>
 
 </div>
+
+<!-- CARDS -->
 
 <div class="cards">
 
@@ -473,6 +423,18 @@ WARKOP SELSU & ZAMORE
 
 </div>
 
+<!-- BEST SELLER -->
+
+<div class="chart-box">
+
+<h3>🔥 Best Seller</h3>
+
+<div id="bestSellerList"></div>
+
+</div>
+
+<!-- CHART -->
+
 <div class="chart-box">
 <h3>Trend Omzet vs Laba</h3>
 <canvas id="chart"></canvas>
@@ -491,7 +453,6 @@ let selectedWeek = null;
 let selectedMonth = null;
 let chart;
 
-// 🔥 FULL MENU DATA (LENGKAP)
 const menuData = {
 "Nasi Telor Crispy":[6500,12000],
 "Nasi Goreng Kampung":[7500,15000],
@@ -524,7 +485,7 @@ const menuData = {
 "Hilo Hazelnut":[2500,8000],
 "Nutrisari Jeruk":[2000,6000],
 "Nutrisari Leci":[2000,6000],
-"Josu":[2500,6000],
+"Josu":[2500,7000],
 "Luwak":[2000,7000],
 "Indocafe":[2000,7000],
 "Creamy Latte":[2000,7000],
@@ -537,6 +498,7 @@ const menuData = {
 "Pisang Nugget isi 4":[5500,10000],
 "Pisang Nugget isi 6":[8500,15000],
 "Basic Cookies":[1500,5000],
+"Ice cream carambol":[5000,10000],
 "Cookies Cadbury":[5000,10000],
 "Cookies S'Mores":[5000,10000],
 "Cookies Cheese":[5000,10000],
@@ -547,18 +509,17 @@ const menuData = {
 "Brownies Cream Cheese":[10000,15000],
 "Dessert Platter":[10000,15000]
 };
-
+  
 function rupiah(n){
 return 'Rp' + Number(n).toLocaleString('id-ID');
 }
 
-// 🔥 FIX TIMEZONE
 function toLocalDate(d){
 return new Date(d).toLocaleDateString('id-ID');
 }
 
-// FILTER
 function setFilter(f){
+
 selectedDate = null;
 currentFilter = f;
 
@@ -571,6 +532,7 @@ f==='weekly'?'btnWeekly':'btnMonthly'
 ).classList.add('active');
 
 render();
+
 }
 
 function filterTanggal(d){
@@ -613,15 +575,9 @@ return new Date(t.tanggal)
 if(selectedMonth){
 
 return transaksi.filter(t=>{
-
 const d = new Date(t.tanggal);
-
-const ym =
-d.getFullYear() + '-' +
-String(d.getMonth()+1).padStart(2,'0');
-
+const ym = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
 return ym === selectedMonth;
-
 });
 
 }
@@ -631,21 +587,17 @@ if(selectedWeek){
 return transaksi.filter(t=>{
 
 const d = new Date(t.tanggal);
-
 const temp = new Date(d);
+
 temp.setHours(0,0,0,0);
 temp.setDate(temp.getDate() + 4 - (temp.getDay() || 7));
 
-const yearStart =
-new Date(temp.getFullYear(),0,1);
+const yearStart = new Date(temp.getFullYear(),0,1);
 
-const weekNo =
-Math.ceil(((((temp-yearStart)/86400000)+1)/7));
+const weekNo = Math.ceil(((((temp-yearStart)/86400000)+1)/7));
 
 const weekString =
-temp.getFullYear() +
-'-W' +
-String(weekNo).padStart(2,'0');
+temp.getFullYear() + '-W' + String(weekNo).padStart(2,'0');
 
 return weekString === selectedWeek;
 
@@ -678,13 +630,18 @@ return d.getMonth() === now.getMonth()
 
 }
 
-// RENDER
 function render(){
 
 const data = getFiltered();
 
-let omzet=0, item=0, profit=0;
-const grafikOmzet={}, grafikProfit={};
+let omzet=0;
+let item=0;
+let profit=0;
+
+const bestSeller = {};
+const grafikOmzet = {};
+const grafikProfit = {};
+const transaksiGroup = {};
 
 data.forEach(trx=>{
 
@@ -694,66 +651,162 @@ const total = Number(trx.total) || 0;
 omzet += total;
 item += qty;
 
+bestSeller[trx.menu] =
+(bestSeller[trx.menu] || 0) + qty;
+
+// GROUP TRANSAKSI
+const key =
+trx.tanggal + '_' + trx.metode;
+
+transaksiGroup[key] = true;
+
 if(menuData[trx.menu]){
-const [m,j]=menuData[trx.menu];
+
+const [m,j] = menuData[trx.menu];
+
 profit += (j-m)*qty;
+
 }
 
 const d = toLocalDate(trx.tanggal);
 
-grafikOmzet[d]=(grafikOmzet[d]||0)+total;
+grafikOmzet[d] =
+(grafikOmzet[d] || 0) + total;
 
 if(menuData[trx.menu]){
+
 const [m,j]=menuData[trx.menu];
-grafikProfit[d]=(grafikProfit[d]||0)+((j-m)*qty);
+
+grafikProfit[d] =
+(grafikProfit[d] || 0)
++ ((j-m)*qty);
+
 }
 
 });
 
-document.getElementById('omzet').innerText = rupiah(omzet);
-document.getElementById('trx').innerText = data.length;
-document.getElementById('profit').innerText = rupiah(profit);
-document.getElementById('item').innerText = item;
+// CARD
+document.getElementById('omzet')
+.innerText = rupiah(omzet);
+
+document.getElementById('trx')
+.innerText =
+Object.keys(transaksiGroup).length;
+
+document.getElementById('profit')
+.innerText = rupiah(profit);
+
+document.getElementById('item')
+.innerText = item;
+
+// BEST SELLER
+
+const sortedBestSeller =
+Object.entries(bestSeller)
+.sort((a,b)=>b[1]-a[1])
+.slice(0,5);
+
+document.getElementById('bestSellerList')
+.innerHTML = sortedBestSeller.map((item,i)=>`
+
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:14px;
+margin-bottom:12px;
+background:#f8f8f8;
+border-radius:16px;
+">
+
+<div>
+
+<div style="
+font-weight:bold;
+margin-bottom:5px;
+">
+#${i+1} ${item[0]}
+</div>
+
+<div style="
+font-size:13px;
+color:#666;
+">
+Menu terlaris
+</div>
+
+</div>
+
+<div style="
+font-size:20px;
+font-weight:bold;
+color:#e63946;
+">
+${item[1]}
+</div>
+
+</div>
+
+`).join('');
 
 // CHART
+
 if(chart) chart.destroy();
 
-chart = new Chart(document.getElementById('chart'),{
+chart = new Chart(
+document.getElementById('chart'),
+{
 type:'line',
+
 data:{
 labels:Object.keys(grafikOmzet),
+
 datasets:[
+
 {
 label:'Omzet',
 data:Object.values(grafikOmzet),
 borderWidth:3
 },
+
 {
 label:'Laba',
 data:Object.values(grafikProfit),
 borderWidth:3
 }
+
 ]
+
 }
+
 });
 
 }
 
-// LOAD
 async function load(){
+
 try{
-const res = await fetch(API_URL + "?t=" + Date.now());
+
+const res =
+await fetch(API_URL + "?t=" + Date.now());
+
 transaksi = await res.json();
+
 render();
+
 }catch(e){
+
 console.log(e);
+
 }
+
 }
 
 load();
+
 setInterval(load,5000);
 
 </script>
 
 </body>
-</html>
+                                    </html>

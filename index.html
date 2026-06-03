@@ -388,9 +388,14 @@ Monthly
 <input type="date" onchange="filterTanggal(this.value)">
 <input type="week" onchange="filterMinggu(this.value)">
 <input type="month" onchange="filterBulan(this.value)">
+<input type="date" id="startDate">
+<input type="date" id="endDate">
 
 <button onclick="resetFilter()">
 Reset
+</button>
+<button onclick="filterRange()">
+Range
 </button>
 
 </div>
@@ -417,6 +422,11 @@ Reset
 </div>
 
 <div class="card blue">
+<h3>Target Laba 10 Juta</h3>
+<h1 id="targetPercent">0%</h1>
+</div>
+
+<div class="card blue">
 <h3>Total Item</h3>
 <h1 id="item">0</h1>
 </div>
@@ -440,6 +450,11 @@ Reset
 <canvas id="chart"></canvas>
 </div>
 
+<div class="chart-box">
+<h3>🎯 Progress Target Laba Rp10.000.000</h3>
+<canvas id="targetChart"></canvas>
+</div>
+
 </div>
 
 <script>
@@ -448,10 +463,16 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyB0_f8z2BV5szaA3tnEmwA
 
 let transaksi = [];
 let currentFilter = 'daily';
+
 let selectedDate = null;
 let selectedWeek = null;
 let selectedMonth = null;
+
+let startDate = null;
+let endDate = null;
+
 let chart;
+let targetChart;
 
 const menuData = {
 "Nasi Telor Crispy":[6500,12000],
@@ -555,14 +576,78 @@ render();
 }
 
 function resetFilter(){
+
 selectedDate = null;
 selectedWeek = null;
 selectedMonth = null;
+
+startDate = null;
+endDate = null;
+
+document.getElementById('startDate').value = '';
+document.getElementById('endDate').value = '';
+
 render();
+
+}
+
+function filterRange(){
+
+startDate =
+document.getElementById('startDate').value;
+
+endDate =
+document.getElementById('endDate').value;
+
+selectedDate = null;
+selectedWeek = null;
+selectedMonth = null;
+
+render();
+
+}
+  function resetFilter(){
+
+selectedDate = null;
+selectedWeek = null;
+selectedMonth = null;
+
+startDate = null;
+endDate = null;
+
+document.getElementById('startDate').value = '';
+document.getElementById('endDate').value = '';
+
+const dateInput = document.querySelector('input[type="date"][onchange*="filterTanggal"]');
+if(dateInput) dateInput.value = '';
+
+const weekInput = document.querySelector('input[type="week"]');
+if(weekInput) weekInput.value = '';
+
+const monthInput = document.querySelector('input[type="month"]');
+if(monthInput) monthInput.value = '';
+
+render();
+
 }
 
 function getFiltered(){
+  
+if(startDate && endDate){
 
+return transaksi.filter(t=>{
+
+const tanggal =
+new Date(t.tanggal)
+.toISOString()
+.split('T')[0];
+
+return tanggal >= startDate
+&& tanggal <= endDate;
+
+});
+
+}
 if(selectedDate){
 
 return transaksi.filter(t=>{
@@ -696,6 +781,18 @@ Object.keys(transaksiGroup).length;
 document.getElementById('profit')
 .innerText = rupiah(profit);
 
+const TARGET_LABA = 10000000;
+
+const persenTarget =
+Math.min(
+((profit / TARGET_LABA) * 100),
+100
+);
+
+document.getElementById('targetPercent')
+.innerText =
+persenTarget.toFixed(1) + '%';
+
 document.getElementById('item')
 .innerText = item;
 
@@ -781,6 +878,42 @@ borderWidth:3
 
 });
 
+if(targetChart) targetChart.destroy();
+
+targetChart = new Chart(
+document.getElementById('targetChart'),
+{
+type:'pie',
+
+data:{
+labels:[
+'Tercapai',
+'Sisa Target'
+],
+
+datasets:[{
+data:[
+Math.min(profit,TARGET_LABA),
+Math.max(
+TARGET_LABA - profit,
+0
+)
+]
+}]
+},
+
+options:{
+responsive:true,
+plugins:{
+legend:{
+position:'bottom'
+}
+}
+}
+
+});
+
+
 }
 
 async function load(){
@@ -809,4 +942,4 @@ setInterval(load,5000);
 </script>
 
 </body>
-                                    </html>
+</html>

@@ -10,6 +10,18 @@
 <meta name="theme-color" content="#14532d">
   
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/service-worker.js")
+      .catch((error) => {
+        console.error("Service Worker gagal:", error);
+      });
+  });
+}
+</script>
+  
 
 <style>
 
